@@ -1,0 +1,19 @@
+## setup & run ##
+docker run --gpus all -dt -v //path/to/deepspeech:/deepspeech --name deepspeech-tf tensorflow/tensorflow:2.3.0-gpu bin/bash
+docker exec -it deepspeech-tf bin/bash
+apt-get update
+apt-get upgrade
+cd deepspeech
+pip install deepspeech-gpu
+pip install webrtcvad
+export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+python vad_transcriber/audioTranscript_cmd.py --model /deepspeech/ --aggressive 3 --audio /deepspeech/10502.04-22-04.speech_16khz.wav
+
+## restart & run ##
+docker start deepspeech-tf
+docker exec -it deepspeech-tf bin/bash
+cd deepspeech
+python vad_transcriber/audioTranscript_cmd.py --model /deepspeech/ --aggressive 3 --audio /deepspeech/data/audio_input_file.wav
+
+## audio prep ##
+ffmpeg -i input.mp4 -af "aformat=sample_fmts=s16:sample_rates=16000" output.wav
